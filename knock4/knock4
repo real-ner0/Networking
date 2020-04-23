@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+# ner0 https://www.github.com/real-ner0
+# knock4 : Implementation of ping (ICMP) for IPv4 Server
+# I'm still working for pinging IPv6 Servers
+
+
+# Check for arguments
+if ARGV.empty?
+  puts "Usage: knock <host_name>"
+  puts "host_name could be hostname or host addrress"
+  exit
+end
+
+
+# Load the libraries
+require 'net/ping'
+require 'socket'
+require 'resolv'
+
+
+host = ARGV[0]
+
+
+# Resolve to IP Address if hostname is entered and get the hostname if IP address in entered
+begin
+  host_addr = IPSocket.getaddress(host)
+  puts "\nTarget -> " +  host_addr + "  <->  " + Resolv.getname(host_addr)
+rescue
+  puts "Failed to resolve IP Address. Aborting\n"
+  exit
+end
+
+
+@icmp = Net::Ping::ICMP.new(host_addr)
+rtary = []
+
+pingfails = 0
+
+puts "\nKnocking...\n"
+puts "CTRL + Z to stop...\n"
+puts
+
+
+# Start pinging
+
+10.times do
+
+  if @icmp.ping
+    rtary << @icmp.duration
+    puts "Got Reply in #{@icmp.duration}"
+  else
+    pingfails += 1
+    puts "Timeout..."
+  end
+
+end
+
+puts "\n#{pingfails} packets were dropped..."
+
+# End of Code
